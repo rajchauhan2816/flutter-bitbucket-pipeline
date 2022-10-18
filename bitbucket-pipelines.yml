@@ -30,11 +30,11 @@ pipelines:
 
             # uploading the apk to slack
             - SLACK_TOKEN=xoxb-768110778567-4174360582223-4ZuXPUzVV6lOeT7jVvI63Tvb
-            - SLACK_CHANEL=C089ZPQDY25
+            - SLACK_CHANNEL=C089ZPQDY25
             - FILE_NAME="apk-$BRANCH_SLUG-release-$BITBUCKET_BUILD_NUMBER.apk"
             - echo "File $FILE_NAME"
             - cp build/app/outputs/flutter-apk/app-dev-release.apk "build/app/outputs/flutter-apk/$FILE_NAME"
-            - curl -F file=@"build/app/outputs/flutter-apk/$FILE_NAME" -F title="tasker $BRANCH_SLUG apk" -F initial_comment="stage - development | branch - $BRANCH_SLUG | user - $BITBUCKET_TRIGGERER_USERNAME | commit_id - $BITBUCKET_COMMIT_SHORT | build_number - $BITBUCKET_BUILD_NUMBER :tada:" -F channels="$SLACK_CHANEL" -F token="$SLACK_TOKEN" https://slack.com/api/files.upload
+            - curl -F file=@"build/app/outputs/flutter-apk/$FILE_NAME" -F title="tasker $BRANCH_SLUG apk" -F initial_comment="stage - development | branch - $BRANCH_SLUG | user - $BITBUCKET_TRIGGERER_USERNAME | commit_id - $BITBUCKET_COMMIT_SHORT | build_number - $BITBUCKET_BUILD_NUMBER :tada:" -F channels="$SLACK_CHANNEL" -F token="$SLACK_TOKEN" https://slack.com/api/files.upload
           artifacts:
             - build/app/outputs/flutter-apk/app-dev-release.apk
     master:
@@ -62,11 +62,11 @@ pipelines:
 
             # uploading the apk to slack
             - SLACK_TOKEN=xoxb-768110778567-4174360582223-4ZuXPUzVV6lOeT7jVvI63Tvb
-            - SLACK_CHANEL=C089ZPQDY25
+            - SLACK_CHANNEL=C089ZPQDY25
             - FILE_NAME="apk-production-release-$BITBUCKET_BUILD_NUMBER.apk"
             - echo "File $FILE_NAME"
             - cp build/app/outputs/flutter-apk/app-production-release.apk "build/app/outputs/flutter-apk/$FILE_NAME"
-            - curl -F file=@"build/app/outputs/flutter-apk/$FILE_NAME" -F title="tasker production apk" -F initial_comment="stage - production | branch - $BRANCH_SLUG | user - $BITBUCKET_TRIGGERER_USERNAME | commit_id - $BITBUCKET_COMMIT_SHORT | build_number - $BITBUCKET_BUILD_NUMBER :tada:" -F channels="$SLACK_CHANEL" -F token="$SLACK_TOKEN" https://slack.com/api/files.upload
+            - curl -F file=@"build/app/outputs/flutter-apk/$FILE_NAME" -F title="tasker production apk" -F initial_comment="stage - production | branch - $BRANCH_SLUG | user - $BITBUCKET_TRIGGERER_USERNAME | commit_id - $BITBUCKET_COMMIT_SHORT | build_number - $BITBUCKET_BUILD_NUMBER :tada:" -F channels="$SLACK_CHANNEL" -F token="$SLACK_TOKEN" https://slack.com/api/files.upload
           artifacts:
             - build/app/outputs/flutter-apk/app-dev-release.apk
   
