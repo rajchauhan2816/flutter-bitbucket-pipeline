@@ -1,0 +1,76 @@
+image: cirrusci/flutter:latest
+
+options:
+  size: 2x
+
+pipelines:
+  branches:
+    dev:
+      - step:
+          caches:
+            - gradle
+            - gradlewrapper
+            - flutter
+          size: 2x
+          script:
+            # Get bitbucket pipeline triggerer username
+            - apt-get update 
+            - apt-get -y install jq
+            - BITBUCKET_TRIGGERER_USERNAME=$(curl -X GET -g "https://api.bitbucket.org/2.0/users/$BITBUCKET_STEP_TRIGGERER_UUID" | jq --raw-output '.display_name')
+            - BRANCH_SLUG="$BITBUCKET_BRANCH"
+            # get the commit id
+            - BITBUCKET_COMMIT_SHORT=$(echo $BITBUCKET_COMMIT | cut -c1-7)
+            # building the apk
+            - echo "Pipeline triggered for a $BRANCH_SLUG branch!"
+            - flutter doctor -v
+            
+            - echo "Building dev release APK..."
+            # command to build apk
+            - flutter build apk --flavor dev -t lib/main_dev.dart
+
+            # uploading the apk to slack
+            - SLACK_TOKEN=xoxb-768110778567-4174360582223-4ZuXPUzVV6lOeT7jVvI63Tvb
+            - SLACK_CHANEL=C089ZPQDY25
+            - FILE_NAME="apk-$BRANCH_SLUG-release-$BITBUCKET_BUILD_NUMBER.apk"
+            - echo "File $FILE_NAME"
+            - cp build/app/outputs/flutter-apk/app-dev-release.apk "build/app/outputs/flutter-apk/$FILE_NAME"
+            - curl -F file=@"build/app/outputs/flutter-apk/$FILE_NAME" -F title="tasker $BRANCH_SLUG apk" -F initial_comment="stage - development | branch - $BRANCH_SLUG | user - $BITBUCKET_TRIGGERER_USERNAME | commit_id - $BITBUCKET_COMMIT_SHORT | build_number - $BITBUCKET_BUILD_NUMBER :tada:" -F channels="$SLACK_CHANEL" -F token="$SLACK_TOKEN" https://slack.com/api/files.upload
+          artifacts:
+            - build/app/outputs/flutter-apk/app-dev-release.apk
+    master:
+      - step:
+          caches:
+            - gradle
+            - gradlewrapper
+            - flutter
+          size: 2x
+          script:
+            # Get bitbucket pipeline triggerer username
+            - apt-get update 
+            - apt-get -y install jq
+            - BITBUCKET_TRIGGERER_USERNAME=$(curl -X GET -g "https://api.bitbucket.org/2.0/users/$BITBUCKET_STEP_TRIGGERER_UUID" | jq --raw-output '.display_name')
+            - BRANCH_SLUG="$BITBUCKET_BRANCH"
+            # get the commit id
+            - BITBUCKET_COMMIT_SHORT=$(echo $BITBUCKET_COMMIT | cut -c1-7)
+            # building the apk
+            - echo "Pipeline triggered for a $BRANCH_SLUG branch!"
+            - flutter doctor -v
+            
+            - echo "Building production release APK..."
+            # command to build apk
+            - flutter build apk --flavor production -t lib/main.dart
+
+            # uploading the apk to slack
+            - SLACK_TOKEN=xoxb-768110778567-4174360582223-4ZuXPUzVV6lOeT7jVvI63Tvb
+            - SLACK_CHANEL=C089ZPQDY25
+            - FILE_NAME="apk-production-release-$BITBUCKET_BUILD_NUMBER.apk"
+            - echo "File $FILE_NAME"
+            - cp build/app/outputs/flutter-apk/app-production-release.apk "build/app/outputs/flutter-apk/$FILE_NAME"
+            - curl -F file=@"build/app/outputs/flutter-apk/$FILE_NAME" -F title="tasker production apk" -F initial_comment="stage - production | branch - $BRANCH_SLUG | user - $BITBUCKET_TRIGGERER_USERNAME | commit_id - $BITBUCKET_COMMIT_SHORT | build_number - $BITBUCKET_BUILD_NUMBER :tada:" -F channels="$SLACK_CHANEL" -F token="$SLACK_TOKEN" https://slack.com/api/files.upload
+          artifacts:
+            - build/app/outputs/flutter-apk/app-dev-release.apk
+  
+definitions:
+  caches:
+    gradlewrapper: ~/.gradle/wrapper
+    flutter: /opt/flutter
